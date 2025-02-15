@@ -1,54 +1,120 @@
-public class Main {
-    public static void main(String[] args) {
+class Animal {
+    private String name;
+    private int age;
+    private String breed;
+    private int price;
 
-        System.out.println("=== Магазин книг ===");
+    public Animal() {}
 
-        Book book1 = new Book("Біба", "біба бобович ", 300);
-        Book book2 = new Book("боба", "Боба бабкович", 250);
-        Book book3 = new Book("абоба", "абоба абобович ", 200);
+    public Animal(String name, int age, String breed, int price) {
+        this.name = name;
+        this.age = age;
+        this.breed = breed;
+        this.price = price;
+    }
 
-        // Знижка
-        book3.price = book3.price - (book3.price * 10 / 100); // Знижка 10%
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public String getBreed() { return breed; }
+    public int getPrice() { return price; }
 
-        // Інфа про книги
-        System.out.println(book1.title + " — " + book1.author + " — " + book1.price + " грн");
-        System.out.println(book2.title + " — " + book2.author + " — " + book2.price + " грн");
-        System.out.println(book3.title + " — " + book3.author + " — " + book3.price + " грн");
-
-        //Задача 2
-        System.out.println("\n=== Геометричні фігури: Коло ===");
-
-        Circle circle = new Circle();
-        circle.radius = 5;
-
-        // Площа і довжина кола
-        double area = 3.14159 * circle.radius * circle.radius;
-        double circumference = 2 * 3.14159 * circle.radius;
-
-        // результати
-        System.out.println("Радіус: " + circle.radius);
-        System.out.println("Площа: " + area);
-        System.out.println("Довжина кола: " + circumference);
+    public void displayInfo() {
+        System.out.println("Ім'я: " + name + ", Вік: " + age + ", Порода: " + breed + ", Ціна: " + price);
     }
 }
 
-// Клас для книг
-class Book {
-    String title;
-    String author;
-    double price;
+class ZooShop {
+    private Animal[] animals;
+    private int count;
 
-    // Конструктор для ініціалізації
-    Book(String t, String a, double p) {
-        title = t;
-        author = a;
-        price = p;
-    }$ git config --global user.name "Borsuki23"
+    public ZooShop(int size) {
+        animals = new Animal[size];
+        count = 0;
+    }
 
-    $ git config --global user.email arturgnat2009@gmail.com
+    public void addAnimal(Animal animal) {
+        if (count < animals.length) {
+            animals[count] = animal;
+            count++;
+            System.out.println(animal.getName() + " додано до магазину.");
+        } else {
+            System.out.println("Магазин заповнений!");
+        }
+    }
+
+    public void removeAnimal(String name) {
+        for (int i = 0; i < count; i++) {
+            if (animals[i].getName().equals(name)) {
+                System.out.println(name + " продано!");
+                animals[i] = animals[count - 1];
+                animals[count - 1] = null;
+                count--;
+                return;
+            }
+        }
+        System.out.println("Тварину не знайдено.");
+    }
+
+    public void displayAnimals() {
+        System.out.println("Список тварин у магазині:");
+        for (int i = 0; i < count; i++) {
+            animals[i].displayInfo();
+        }
+    }
+
+    public Animal findAnimal(String name) {
+        for (int i = 0; i < count; i++) {
+            if (animals[i].getName().equals(name)) {
+                return animals[i];
+            }
+        }
+        return null;
+    }
 }
 
-//Клас для кола (змінна для радіуса)
-class Circle {
-    double radius;
+class Customer {
+    private String name;
+    private int money;
+
+    public Customer(String name, int money) {
+        this.name = name;
+        this.money = money;
+    }
+
+    public void buyAnimal(ZooShop shop, String animalName) {
+        Animal animal = shop.findAnimal(animalName);
+        if (animal != null && money >= animal.getPrice()) {
+            money -= animal.getPrice();
+            shop.removeAnimal(animalName);
+            System.out.println(name + " купив " + animalName + " за " + animal.getPrice() + " грн.");
+        } else {
+            System.out.println("Не вдалося купити " + animalName + ". Можливо, не вистачає грошей або тварина відсутня.");
+        }
+    }
+
+    public void displayInfo() {
+        System.out.println("Ім'я покупця: " + name + ", Гроші: " + money + " грн");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ZooShop shop = new ZooShop(10);
+
+        Animal cat = new Animal("Барсик", 3, "Сибірська", 500);
+        Animal dog = new Animal("Рекс", 5, "Німецька вівчарка", 1000);
+
+        shop.addAnimal(cat);
+        shop.addAnimal(dog);
+
+        shop.displayAnimals();
+
+        Customer customer = new Customer("Іван", 1200);
+        customer.displayInfo();
+
+        customer.buyAnimal(shop, "Рекс");
+        customer.displayInfo();
+
+        shop.displayAnimals();
+    }
 }
