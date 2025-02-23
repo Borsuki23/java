@@ -1,75 +1,101 @@
-class Employee {
+abstract class Animal {
     private String name;
-    private int age;
-    private double salary;
 
-    public Employee(String name, int age, double salary) {
+    public Animal(String name) {
         this.name = name;
-        this.age = age;
-        this.salary = salary;
     }
 
-    public double getSalary() {
-        return salary;
+    public String getName() {
+        return name;
     }
 
-    public void setSalary(double salary) {
-        this.salary = salary;
-    }
-
-    public void increaseSalary(double amount) {
-        if (amount > 0) {
-            this.salary += amount;
-        }
-    }
-
-    public void displayInfo() {
-        System.out.println("Имя: " + name + ", Возраст: " + age + ", Зарплата: " + salary);
+    public void makeSound() {
+        System.out.println(name + " - Some generic animal sound");
     }
 }
 
-class Manager extends Employee {
-    private double bonus;
-
-    public Manager(String name, int age, double salary, double bonus) {
-        super(name, age, salary);
-        this.bonus = bonus;
+class Dog extends Animal {
+    public Dog() {
+        super("Dog");
     }
 
     @Override
-    public void displayInfo() {
-        super.displayInfo();
-        System.out.println("Бонус: " + bonus);
+    public void makeSound() {
+        System.out.println(getName() + " - Woof woof");
     }
 }
 
-class Developer extends Employee {
-    private String programmingLanguage;
-
-    public Developer(String name, int age, double salary, String programmingLanguage) {
-        super(name, age, salary);
-        this.programmingLanguage = programmingLanguage;
+class Cat extends Animal {
+    public Cat() {
+        super("Cat");
     }
 
     @Override
-    public void displayInfo() {
-        super.displayInfo();
-        System.out.println("Язык программирования: " + programmingLanguage);
+    public void makeSound() {
+        System.out.println(getName() + " - Meow");
+    }
+}
+
+class Parrot extends Animal {
+    public Parrot() {
+        super("Parrot");
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(getName() + " - Squawk");
+    }
+}
+
+class CustomAnimal extends Animal {
+    private String sound;
+
+    public CustomAnimal(String name, String sound) {
+        super(name);
+        this.sound = sound;
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(getName() + " - " + sound);
+    }
+}
+
+class Fish extends Animal {
+    public Fish() {
+        super("Fish");
+    }
+
+    @Override
+    public void makeSound() {
+        // Fish does not make a sound
+    }
+
+    public void swim() {
+        System.out.println(getName() + " is swimming");
     }
 }
 
 public class Main {
+    public static void printAnimalActions(Animal[] animals) {
+        for (Animal animal : animals) {
+            if (animal instanceof Fish) {
+                ((Fish) animal).swim();
+            } else {
+                animal.makeSound();
+            }
+        }
+    }
+
     public static void main(String[] args) {
-        Manager manager = new Manager("Алексей", 40, 80000, 10000);
-        Developer developer = new Developer("Иван", 30, 60000, "Java");
+        Animal[] animals = {
+                new Dog(),
+                new Cat(),
+                new Parrot(),
+                new Fish(),
+                new CustomAnimal("Lion", "Roar")
+        };
 
-        System.out.println("До повышения зарплаты:");
-        manager.displayInfo();
-        developer.displayInfo();
-
-        manager.increaseSalary(5000);
-
-        System.out.println("После повышения зарплаты менеджеру:");
-        manager.displayInfo();
+        printAnimalActions(animals);
     }
 }
