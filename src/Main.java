@@ -1,101 +1,56 @@
-abstract class Animal {
+import java.util.ArrayList;
+
+class Dish {
     private String name;
+    private double price;
+    private String category;
 
-    public Animal(String name) {
+    public Dish(String name, double price, String category) {
         this.name = name;
+        this.price = price;
+        this.category = category;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void makeSound() {
-        System.out.println(name + " - Some generic animal sound");
+    public void displayInfo() {
+        System.out.println("Назва: " + name + ", Ціна: " + price + " грн, Категорія: " + category);
     }
 }
 
-class Dog extends Animal {
-    public Dog() {
-        super("Dog");
+// Клас, що управляє ресторанним меню
+class Restaurant {
+    private static ArrayList<Dish> menu = new ArrayList<>();
+
+    public static void addDish(Dish dish) {
+        menu.add(dish);
     }
 
-    @Override
-    public void makeSound() {
-        System.out.println(getName() + " - Woof woof");
-    }
-}
-
-class Cat extends Animal {
-    public Cat() {
-        super("Cat");
+    public static int getTotalDishes() {
+        return menu.size();
     }
 
-    @Override
-    public void makeSound() {
-        System.out.println(getName() + " - Meow");
-    }
-}
-
-class Parrot extends Animal {
-    public Parrot() {
-        super("Parrot");
-    }
-
-    @Override
-    public void makeSound() {
-        System.out.println(getName() + " - Squawk");
-    }
-}
-
-class CustomAnimal extends Animal {
-    private String sound;
-
-    public CustomAnimal(String name, String sound) {
-        super(name);
-        this.sound = sound;
-    }
-
-    @Override
-    public void makeSound() {
-        System.out.println(getName() + " - " + sound);
-    }
-}
-
-class Fish extends Animal {
-    public Fish() {
-        super("Fish");
-    }
-
-    @Override
-    public void makeSound() {
-        // Fish does not make a sound
-    }
-
-    public void swim() {
-        System.out.println(getName() + " is swimming");
+    public static void displayMenu() {
+        for (Dish dish : menu) {
+            dish.displayInfo();
+        }
     }
 }
 
 public class Main {
-    public static void printAnimalActions(Animal[] animals) {
-        for (Animal animal : animals) {
-            if (animal instanceof Fish) {
-                ((Fish) animal).swim();
-            } else {
-                animal.makeSound();
-            }
-        }
-    }
-
     public static void main(String[] args) {
-        Animal[] animals = {
-                new Dog(),
-                new Cat(),
-                new Parrot(),
-                new Fish(),
-                new CustomAnimal("Lion", "Roar")
-        };
+        // Створення об'єктів страв
+        Dish soup = new Dish("Суп", 120.50, "Гаряча страва");
+        Dish pizza = new Dish("Піца", 250.00, "Основна страва");
+        Dish iceCream = new Dish("Морозиво", 90.75, "Десерт");
 
-        printAnimalActions(animals);
+
+        Restaurant.addDish(soup);
+        Restaurant.addDish(pizza);
+        Restaurant.addDish(iceCream);
+
+        System.out.println("Меню ресторану:");
+        Restaurant.displayMenu();
+
+
+        System.out.println("Загальна кількість страв у меню: " + Restaurant.getTotalDishes());
     }
 }
