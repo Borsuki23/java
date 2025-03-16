@@ -3,7 +3,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Main {
+public class Main{
+    private JTextField display;
+    private String currentInput = "";
+    private double firstOperand = 0;
+    private String operator = "";
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new Main().createAndShowGUI());
     }
@@ -14,7 +19,7 @@ public class Main {
         frame.setSize(400, 500);
         frame.setLayout(new BorderLayout());
 
-        JTextField display = new JTextField();
+        display = new JTextField();
         display.setEditable(false);
         display.setFont(new Font("Arial", Font.BOLD, 24));
         display.setHorizontalAlignment(JTextField.RIGHT);
@@ -31,20 +36,61 @@ public class Main {
             button.setOpaque(true);
             button.setBorderPainted(false);
 
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    button.setBackground(Color.ORANGE);
-                    Timer timer = new Timer(200, evt -> button.setBackground(Color.LIGHT_GRAY));
-                    timer.setRepeats(false);
-                    timer.start();
-                }
-            });
+            button.addActionListener(new ButtonClickListener(text));
 
             buttonPanel.add(button);
         }
 
         frame.add(buttonPanel, BorderLayout.CENTER);
         frame.setVisible(true);
+    }
+
+    private class ButtonClickListener implements ActionListener {
+        private String value;
+
+        public ButtonClickListener(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            handleInput(value);
+        }
+    }
+
+    private void handleInput(String value) {
+        if (value.matches("[0-9]") || value.equals(".")) {
+            currentInput += value;
+            display.setText(currentInput);
+        } else if (value.equals("C")) {
+            currentInput = "";
+            firstOperand = 0;
+            operator = "";
+            display.setText("");
+        } else if (value.equals("=")) {
+            if (!currentInput.isEmpty() && !operator.isEmpty()) {
+                double secondOperand = Double.parseDouble(currentInput);
+                double result = calculate(firstOperand, secondOperand, operator);
+                display.setText(String.valueOf(result));
+                currentInput = "";
+                operator = "";
+            }
+        } else {
+            if (!currentInput.isEmpty()) {
+                firstOperand = Double.parseDouble(currentInput);
+                operator = value;
+                currentInput = "";
+            }
+        }
+    }
+
+    private double calculate(double a, double b, String op) {
+        switch (op) {
+            case "+": return a + b;
+            case "-": return a - b;
+            case "*": return a * b;
+            case "/": return b != 0 ? a / b : 0;
+            default: return 0;
+        }
     }
 }
