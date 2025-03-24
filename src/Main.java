@@ -1,96 +1,82 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-//calculator
-public class Main{
-    private JTextField display;
-    private String currentInput = "";
-    private double firstOperand = 0;
-    private String operator = "";
+import java.awt.event.*;
+import java.util.ArrayList;
 
+class PaintPanel extends JPanel {
+    private ArrayList<Point> points = new ArrayList<>();
+    private ArrayList<Color> colors = new ArrayList<>();
+    private Color currentColor = Color.BLACK;
+    private boolean eraserMode = false;
+
+    public PaintPanel() {
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                points.add(e.getPoint());
+                colors.add(eraserMode ? Color.WHITE : currentColor);
+                repaint();
+            }
+        });
+    }
+
+    public void setColor(Color color) {
+        currentColor = color;
+        eraserMode = false;
+    }
+
+    public void enableEraser() {
+        eraserMode = true;
+    }
+
+    public void clear() {
+        points.clear();
+        colors.clear();
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        for (int i = 0; i < points.size(); i++) {
+            g.setColor(colors.get(i));
+            g.fillOval(points.get(i).x, points.get(i).y, 5, 5);
+        }
+    }
+}
+
+public class Main {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Main().createAndShowGUI());
-    }
+        JFrame frame = new JFrame("Simple Paint");
+        PaintPanel paintPanel = new PaintPanel();
+        JPanel controlPanel = new JPanel();
 
-    private void createAndShowGUI() {
-        JFrame frame = new JFrame("Калькулятор");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 500);
+        JButton blackButton = new JButton("Black");
+        JButton redButton = new JButton("Red");
+        JButton blueButton = new JButton("Blue");
+        JButton greenButton = new JButton("Green");
+        JButton eraserButton = new JButton("Eraser");
+        JButton clearButton = new JButton("Clear");
+
+        blackButton.addActionListener(e -> paintPanel.setColor(Color.BLACK));
+        redButton.addActionListener(e -> paintPanel.setColor(Color.RED));
+        blueButton.addActionListener(e -> paintPanel.setColor(Color.BLUE));
+        greenButton.addActionListener(e -> paintPanel.setColor(Color.GREEN));
+        eraserButton.addActionListener(e -> paintPanel.enableEraser());
+        clearButton.addActionListener(e -> paintPanel.clear());
+
+        controlPanel.add(blackButton);
+        controlPanel.add(redButton);
+        controlPanel.add(blueButton);
+        controlPanel.add(greenButton);
+        controlPanel.add(eraserButton);
+        controlPanel.add(clearButton);
+
         frame.setLayout(new BorderLayout());
-
-        display = new JTextField();
-        display.setEditable(false);
-        display.setFont(new Font("Arial", Font.BOLD, 24));
-        display.setHorizontalAlignment(JTextField.RIGHT);
-        frame.add(display, BorderLayout.NORTH);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(4, 4, 10, 10));
-        String[] buttons = {"7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", "C", "=", "+"};
-
-        for (String text : buttons) {
-            JButton button = new JButton(text);
-            button.setFont(new Font("Arial", Font.BOLD, 20));
-            button.setBackground(Color.LIGHT_GRAY);
-            button.setOpaque(true);
-            button.setBorderPainted(false);
-
-            button.addActionListener(new ButtonClickListener(text));
-
-            buttonPanel.add(button);
-        }
-
-        frame.add(buttonPanel, BorderLayout.CENTER);
+        frame.add(paintPanel, BorderLayout.CENTER);
+        frame.add(controlPanel, BorderLayout.NORTH);
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-    }
-
-    private class ButtonClickListener implements ActionListener {
-        private String value;
-
-        public ButtonClickListener(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            handleInput(value);
-        }
-    }
-
-    private void handleInput(String value) {
-        if (value.matches("[0-9]") || value.equals(".")) {
-            currentInput += value;
-            display.setText(currentInput);
-        } else if (value.equals("C")) {
-            currentInput = "";
-            firstOperand = 0;
-            operator = "";
-            display.setText("");
-        } else if (value.equals("=")) {
-            if (!currentInput.isEmpty() && !operator.isEmpty()) {
-                double secondOperand = Double.parseDouble(currentInput);
-                double result = calculate(firstOperand, secondOperand, operator);
-                display.setText(String.valueOf(result));
-                currentInput = "";
-                operator = "";
-            }
-        } else {
-            if (!currentInput.isEmpty()) {
-                firstOperand = Double.parseDouble(currentInput);
-                operator = value;
-                currentInput = "";
-            }
-        }
-    }
-
-    private double calculate(double a, double b, String op) {
-        switch (op) {
-            case "+": return a + b;
-            case "-": return a - b;
-            case "*": return a * b;
-            case "/": return b != 0 ? a / b : 0;
-            default: return 0;
-        }
     }
 }
