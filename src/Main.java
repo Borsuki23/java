@@ -1,60 +1,59 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 public class Main {
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new StopwatchFrame());
+
+    // Власний виняток, якщо число не парне
+    static class NotEvenNumberException extends Exception {
+        public NotEvenNumberException(String message) {
+            super(message);
+        }
     }
-}
 
-class StopwatchFrame extends JFrame {
-    private JLabel timeLabel;
-    private JButton startButton, stopButton, resetButton;
-    private Timer timer;
-    private int elapsedTime = 0;
-
-    public StopwatchFrame() {
-        setTitle("Секундомір");
-        setSize(300, 200);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new FlowLayout());
-
-        timeLabel = new JLabel(formatTime(elapsedTime));
-        timeLabel.setFont(new Font("Arial", Font.BOLD, 30));
-        add(timeLabel);
-
-        startButton = new JButton("Старт");
-        stopButton = new JButton("Стоп");
-        resetButton = new JButton("Скинути");
-
-        add(startButton);
-        add(stopButton);
-        add(resetButton);
-
-        timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                elapsedTime++;
-                timeLabel.setText(formatTime(elapsedTime));
+    // Перевірка, що всі числа парні
+    public static void checkEvenNumbers(int[] numbers) throws NotEvenNumberException {
+        for (int number : numbers) {
+            if (number % 2 != 0) {
+                throw new NotEvenNumberException("Знайдено непарне число: " + number);
             }
-        });
-
-        startButton.addActionListener(e -> timer.start());
-        stopButton.addActionListener(e -> timer.stop());
-        resetButton.addActionListener(e -> {
-            timer.stop();
-            elapsedTime = 0;
-            timeLabel.setText(formatTime(elapsedTime));
-        });
-
-        setVisible(true);
+        }
     }
 
-    private String formatTime(int seconds) {
-        int mins = seconds / 60;
-        int secs = seconds % 60;
-        return String.format("%02d:%02d", mins, secs);
+    // Розрахунок середнього значення
+    public static double calculateAverage(int[] numbers) {
+        int sum = 0;
+        for (int n : numbers) {
+            sum += n;
+        }
+        return (double) sum / numbers.length;
+    }
+
+    // Друк масиву
+    public static void printArray(int[] array) {
+        System.out.print("Масив: ");
+        for (int num : array) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        int[] data1 = {2, 4, 6, 8};
+        int[] data2 = {1, 3, 5};
+
+        try {
+            printArray(data1);
+            checkEvenNumbers(data1);
+            System.out.println("Середнє значення: " + calculateAverage(data1));
+        } catch (NotEvenNumberException e) {
+            System.out.println("Помилка: " + e.getMessage());
+        }
+
+        System.out.println();
+
+        try {
+            printArray(data2);
+            checkEvenNumbers(data2);
+            System.out.println("Середнє значення: " + calculateAverage(data2));
+        } catch (NotEvenNumberException e) {
+            System.out.println("Помилка: " + e.getMessage());
+        }
     }
 }
