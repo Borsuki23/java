@@ -1,18 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Calculator {
     private JTextField display;
-    private JTextArea historyArea;
     private String currentInput = "";
     private double firstOperand = 0;
     private String operator = "";
-    private final String HISTORY_FILE = "history.txt";
+    private final String historyFilePath = "history.txt"; // Псевдо JSON
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new Calculator().createAndShowGUI());
@@ -21,21 +18,18 @@ public class Calculator {
     private void createAndShowGUI() {
         JFrame frame = new JFrame("Калькулятор");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 500);
+        frame.setSize(400, 500);
         frame.setLayout(new BorderLayout());
 
-        // Поле для поточних обчислень
         display = new JTextField();
         display.setEditable(false);
         display.setFont(new Font("Arial", Font.BOLD, 24));
         display.setHorizontalAlignment(JTextField.RIGHT);
         frame.add(display, BorderLayout.NORTH);
 
-        // Панель кнопок
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(4, 4, 10, 10));
-        String[] buttons = {"7", "8", "9", "/", "4", "5", "6", "*",
-                "1", "2", "3", "-", "0", "C", "=", "+"};
+        String[] buttons = {"7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", "C", "=", "+"};
 
         for (String text : buttons) {
             JButton button = new JButton(text);
@@ -43,23 +37,14 @@ public class Calculator {
             button.setBackground(Color.LIGHT_GRAY);
             button.setOpaque(true);
             button.setBorderPainted(false);
-
             button.addActionListener(new ButtonClickListener(text));
             buttonPanel.add(button);
         }
 
         frame.add(buttonPanel, BorderLayout.CENTER);
 
-        // Історія обчислень
-        historyArea = new JTextArea();
-        historyArea.setEditable(false);
-        historyArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        JScrollPane scrollPane = new JScrollPane(historyArea);
-        scrollPane.setPreferredSize(new Dimension(200, frame.getHeight()));
-        frame.add(scrollPane, BorderLayout.EAST);
-
-        // Завантаження історії
-        loadHistory();
+        // При запуску показуємо історію в консолі
+        readHistory();
 
         frame.setVisible(true);
     }
@@ -91,10 +76,8 @@ public class Calculator {
                 double secondOperand = Double.parseDouble(currentInput);
                 double result = calculate(firstOperand, secondOperand, operator);
                 String expression = firstOperand + " " + operator + " " + secondOperand + " = " + result;
-
                 display.setText(String.valueOf(result));
-                appendToHistory(expression);
-
+                saveToHistory(expression);
                 currentInput = "";
                 operator = "";
             }
@@ -117,28 +100,29 @@ public class Calculator {
         }
     }
 
-    private void appendToHistory(String entry) {
-        try (FileWriter fw = new FileWriter(HISTORY_FILE, true);
-             BufferedWriter bw = new BufferedWriter(fw)) {
-            bw.write(entry);
-            bw.newLine();
-            historyArea.append(entry + "\n");
+    private void saveToHistory(String record) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(historyFilePath, true))) {
+            writer.write("{\"entry\": \"" + record + "\"}\n"); // Псевдо JSON
         } catch (IOException e) {
-            System.err.println("Помилка запису в історію: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void loadHistory() {
-        File file = new File(HISTORY_FILE);
-        if (!file.exists()) return;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                historyArea.append(line + "\n");
+    private void readHistory() {
+        File file = new File(historyFilePath);
+        if (file.exists()) {
+            System.out.println("🔎 Історія обчислень:");
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
+                System.out.println("— Кінець історії —\n");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            System.err.println("Помилка читання історії: " + e.getMessage());
+        } else {
+            System.out.println("Історія ще не створена.");
         }
     }
 }
