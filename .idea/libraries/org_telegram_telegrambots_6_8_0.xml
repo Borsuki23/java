@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="org.telegram:telegrambots:6.8.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/json-20250107.jar!/" />
+      <root url="file://$PROJECT_DIR$/libs" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/libs" recursive="false" />
+  </library>
+</component>
